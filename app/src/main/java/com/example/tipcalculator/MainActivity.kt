@@ -1,6 +1,7 @@
 package com.example.tipcalculator
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,6 +39,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,10 +67,12 @@ class MainActivity : ComponentActivity() {
 fun TipCalculatorScreen(modifier: Modifier) {
     var billAmount by remember { mutableStateOf("") }
     var selectedTip by remember { mutableFloatStateOf(15f) }
+    var numberOfPeople by remember { mutableStateOf("") }
 
     val bill = billAmount.toFloatOrNull() ?: 0f
+    val people = numberOfPeople.toIntOrNull() ?: 1
     val tip = bill * (selectedTip / 100)
-    val total = bill + tip
+    val total = (bill + tip) / people
 
     Column(
         modifier = Modifier
@@ -76,15 +81,29 @@ fun TipCalculatorScreen(modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        BillInput(
-            billAmount = billAmount,
-            onBillAmountChange = { value -> billAmount = value }
-        )
+        UserTextInput(
+            inputValue = billAmount,
+            onInputValueChange = { value -> billAmount = value },
+            label = "Bill",
+            placeholder = "Enter your amount",
+            iconResource = painterResource(R.drawable.icon_dollar),
+            iconDescription = stringResource(id = R.string.icon_dollar)
 
+        )
 
         TipSelector(
             selectedTip = selectedTip,
             onTipSelected = { value -> selectedTip = value }
+        )
+
+        UserTextInput(
+            inputValue = billAmount,
+            onInputValueChange = { value -> billAmount = value },
+            label = "Number of People",
+            placeholder = "Enter a number",
+            iconResource = painterResource(R.drawable.icon_person),
+            iconDescription = stringResource(id = R.string.icon_person)
+
         )
 
         // Display Tip AMount and Total
@@ -104,24 +123,28 @@ fun TipCalculatorScreen(modifier: Modifier) {
 }
 
 @Composable
-fun BillInput(
-    billAmount: String,
-    onBillAmountChange: (String) -> Unit
+fun UserTextInput(
+    inputValue: String,
+    onInputValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    iconResource: Painter,
+    iconDescription: String
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Bill",
+            text = label,
             color = colorResource(id = R.color.grayish_cyan)
         )
         // Bill Amount Input
         OutlinedTextField(
-            value = billAmount,
-            onValueChange = { onBillAmountChange(it) },
+            value = inputValue,
+            onValueChange = { onInputValueChange(it) },
             label = {
                 Text(
-                    text = "Enter your amount",
+                    text = placeholder,
                     textAlign = TextAlign.End,
                     color = colorResource(id = R.color.very_dark_cyan),
                     modifier = Modifier.fillMaxWidth()
@@ -133,8 +156,8 @@ fun BillInput(
                 .background(color = colorResource(id = R.color.very_light_grayish_cyan)),
             leadingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.icon_dollar),
-                    contentDescription = stringResource(id = R.string.icon_dollar)
+                    painter = iconResource,
+                    contentDescription = iconDescription
                 )
             },
             colors = OutlinedTextFieldDefaults.colors(

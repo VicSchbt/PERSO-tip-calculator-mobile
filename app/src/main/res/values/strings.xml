@@ -2,4 +2,5 @@
     <string name="app_name">Tip Calculator</string>
 
     <string name="icon_dollar">Dollar icon</string>
+    <string name="icon_person">Person icon</string>
 </resources>
