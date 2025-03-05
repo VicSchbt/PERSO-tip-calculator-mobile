@@ -17,7 +17,6 @@ A simple yet functional Tip Calculator Android app built with Jetpack Compose. T
 - 🏗️ **Jetpack Compose**
 - 🎨 **Material 3**
 - 📌 **State Management with remember**
-- 📊 **LazyVerticalGrid**
 
 ## 🎯 Lessons Learned
 
@@ -25,7 +24,6 @@ This project was a great opportunity to strengthen my skills in:
 
 ### 📌 Jetpack Compose UI Development
 - Implementing a fully Compose-based UI without XML.
-- Using `LazyVerticalGrid` to create a flexible tip selection layout.
 - Customizing `OutlinedTextField` to fit a modern UI design.
 
 ### 📌 State Management & Recomposition
