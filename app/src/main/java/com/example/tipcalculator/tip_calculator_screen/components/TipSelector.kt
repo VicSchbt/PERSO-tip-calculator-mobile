@@ -13,14 +13,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -38,11 +33,11 @@ import com.example.tipcalculator.ui.theme.SpaceMono
 @Composable
 fun TipSelector(
     tipsOptions: List<Float>,
-    onTipSelected: (Float) -> Unit
+    selectedTip: Float,
+    customTip: String,
+    onButtonClick: (Float) -> Unit,
+    onCustomChange: (String) -> Unit
 ) {
-    var selectedTip by remember { mutableStateOf<Float?>(null) }
-    var customTip by remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
 
     Label("Select Tip %")
 
@@ -56,12 +51,7 @@ fun TipSelector(
                 rowTips.forEach { tip ->
                     TipButton(
                         tip,
-                        onClick = {
-                            selectedTip = tip
-                            customTip = ""
-                            focusManager.clearFocus()
-                            onTipSelected(tip)
-                        },
+                        onClick = { onButtonClick(tip) },
                         isSelected = selectedTip == tip,
                         modifier = Modifier.weight(1f)
                     )
@@ -81,12 +71,7 @@ fun TipSelector(
             TipTextField(
                 customTip,
                 onValueChange = { newText: String ->
-                    customTip = newText
-                    selectedTip = null
-                    val tipValue = newText.toFloatOrNull()
-                    if (tipValue != null) {
-                        onTipSelected(tipValue)
-                    }
+                    onCustomChange(newText)
                 },
                 modifier = Modifier.weight(1f)
             )

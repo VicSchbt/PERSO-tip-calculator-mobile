@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,12 +28,14 @@ import com.example.tipcalculator.utils.calculateTip
 @Composable
 fun TipCalculatorScreen(modifier: Modifier) {
     var billAmount by remember { mutableStateOf("") }
-    var selectedTip by remember { mutableFloatStateOf(15f) }
+    var selectedTip by remember { mutableFloatStateOf(0f) }
+    var customTip by remember { mutableStateOf("") }
     var numberOfPeople by remember { mutableStateOf("") }
 
     val bill = billAmount.toFloatOrNull() ?: 0f
     val people = numberOfPeople.toIntOrNull()?.takeIf { it > 0 } ?: 1
     val (tipPerPerson, totalPerPerson) = calculateTip(bill, selectedTip, people)
+    val focusManager = LocalFocusManager.current
 
     val tipsOptions = listOf(5f, 10f, 15f, 25f, 50f)
 
@@ -58,7 +61,18 @@ fun TipCalculatorScreen(modifier: Modifier) {
 
             TipSelector(
                 tipsOptions = tipsOptions,
-                onTipSelected = { value -> selectedTip = value },
+                selectedTip = selectedTip,
+                customTip = customTip,
+                onButtonClick = { value ->
+                    selectedTip = value
+                    customTip = ""
+                    focusManager.clearFocus()
+                },
+                onCustomChange = { value ->
+                    customTip = value
+                    val tipValue = value.toFloatOrNull()
+                    if (tipValue != null) selectedTip = tipValue
+                }
             )
 
             UserTextInput(
@@ -78,6 +92,8 @@ fun TipCalculatorScreen(modifier: Modifier) {
                 billAmount = ""
                 selectedTip = 0f
                 numberOfPeople = ""
+                customTip = ""
+                focusManager.clearFocus()
             }
         )
     }
