@@ -1,7 +1,9 @@
 package com.example.tipcalculator.tip_calculator_screen.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,60 +46,55 @@ fun TipSelector(
 
     Label("Select Tip %")
 
-    for (i in 0..tipsOptions.size step 2) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        tipsOptions.chunked(2).forEach { rowTips ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                rowTips.forEach { tip ->
+                    TipButton(
+                        tip,
+                        onClick = {
+                            selectedTip = tip
+                            customTip = ""
+                            focusManager.clearFocus()
+                            onTipSelected(tip)
+                        },
+                        isSelected = selectedTip == tip,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (rowTips.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (i < tipsOptions.size) {
-                val tip = tipsOptions[i]
-                TipButton(
-                    tip,
-                    onClick = {
-                        selectedTip = tip
-                        customTip = ""
-                        focusManager.clearFocus()
-                        onTipSelected(tip)
-                    },
-                    isSelected = selectedTip == tip,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            if (i + 1 < tipsOptions.size) {
-                val tip = tipsOptions[i + 1]
-                TipButton(
-                    tip,
-                    onClick = {
-                        selectedTip = tip
-                        customTip = ""
-                        focusManager.clearFocus()
-                        onTipSelected(tip)
-                    },
-                    isSelected = selectedTip == tip,
-                    modifier = Modifier.weight(1f)
-                )
 
-            }
-            if (tipsOptions.size in intArrayOf(i, i + 1)) {
-                TipTextField(
-                    customTip,
-                    onValueChange = { newText: String ->
+            TipTextField(
+                customTip,
+                onValueChange = { newText: String ->
                     customTip = newText
-                        selectedTip = null
+                    selectedTip = null
                     val tipValue = newText.toFloatOrNull()
                     if (tipValue != null) {
                         onTipSelected(tipValue)
                     }
                 },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
+                modifier = Modifier.weight(1f)
+            )
         }
-    }
 
+    }
 }
+
 
 @Composable
 fun TipButton(tip: Float, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier) {
