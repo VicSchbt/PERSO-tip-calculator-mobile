@@ -12,9 +12,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -31,12 +35,13 @@ import com.example.tipcalculator.ui.theme.SpaceMono
 
 @Composable
 fun TipSelector(
-    selectedTip: Float,
-    onTipSelected: (Float) -> Unit,
-    customTip: String,
-    onCustomTipChange: (String) -> Unit
+    tipsOptions: List<Float>,
+    onTipSelected: (Float) -> Unit
 ) {
-    val tipsOptions = listOf(5f, 10f, 15f, 25f, 50f)
+    var selectedTip by remember { mutableStateOf<Float?>(null) }
+    var customTip by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+
 
     Label("Select Tip %")
 
@@ -49,7 +54,9 @@ fun TipSelector(
             item {
                 Button(
                     onClick = {
-                        onCustomTipChange("")
+                        selectedTip = tip  // Update selected tip
+                        customTip = ""  // Reset custom input
+                        focusManager.clearFocus() // Hide keyboard
                         onTipSelected(tip)
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -75,7 +82,14 @@ fun TipSelector(
         item {
             OutlinedTextField(
                 value = customTip,
-                onValueChange = { onCustomTipChange(it) },
+                onValueChange = { newText ->
+                    customTip = newText
+                    selectedTip = null  // Unselect buttons
+                    val tipValue = newText.toFloatOrNull()
+                    if (tipValue != null) {
+                        onTipSelected(tipValue)
+                    }
+                },
                 label = {
                     Text(
                         text = "Custom",

@@ -29,11 +29,12 @@ fun TipCalculatorScreen(modifier: Modifier) {
     var billAmount by remember { mutableStateOf("") }
     var selectedTip by remember { mutableFloatStateOf(15f) }
     var numberOfPeople by remember { mutableStateOf("") }
-    var customTip by remember { mutableStateOf("") }
 
     val bill = billAmount.toFloatOrNull() ?: 0f
     val people = numberOfPeople.toIntOrNull()?.takeIf { it > 0 } ?: 1
     val (tipPerPerson, totalPerPerson) = calculateTip(bill, selectedTip, people)
+
+    val tipsOptions = listOf(5f, 10f, 15f, 25f, 50f)
 
     Column(
         modifier = Modifier
@@ -56,12 +57,8 @@ fun TipCalculatorScreen(modifier: Modifier) {
             )
 
             TipSelector(
-                selectedTip = selectedTip,
+                tipsOptions = tipsOptions,
                 onTipSelected = { value -> selectedTip = value },
-                customTip = customTip,
-                onCustomTipChange = {
-                    selectedTip = customTip.toFloatOrNull() ?: 0f
-                }
             )
 
             UserTextInput(
@@ -79,7 +76,7 @@ fun TipCalculatorScreen(modifier: Modifier) {
             tipPerPerson = tipPerPerson,
             onResetClicked = {
                 billAmount = ""
-                selectedTip = 15f
+                selectedTip = 0f
                 numberOfPeople = ""
             }
         )
